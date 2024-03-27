@@ -1,0 +1,66 @@
+name: Autograding Tests
+'on':
+- push
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: test-numbers
+      id: test-numbers
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: test-numbers
+        setup-command: npm install
+        command: npx jest __tests__/numbers.test.js
+        timeout: 10
+    - name: test-boolean
+      id: test-boolean
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: test-boolean
+        setup-command: npm install
+        command: npx jest __tests__/boolean.test.js
+        timeout: 10
+    - name: test-loops
+      id: test-loops
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: test-loops
+        setup-command: npm install
+        command: npx jest __tests__/loops.test.js
+        timeout: 10
+    - name: test-branching
+      id: test-branching
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: test-branching
+        setup-command: npm install
+        command: npx jest __tests__/branching.test.js
+        timeout: 10
+    - name: test-strings
+      id: test-strings
+      uses: education/autograding-command-grader@v1
+      with:
+        test-name: test-strings
+        setup-command: npm install
+        command: npx jest __tests__/strings.test.js
+        timeout: 10
+    - name: Autograding Reporter
+      uses: education/autograding-grading-reporter@v1
+      env:
+        TEST-NUMBERS_RESULTS: "${{steps.test-numbers.outputs.result}}"
+        TEST-BOOLEAN_RESULTS: "${{steps.test-boolean.outputs.result}}"
+        TEST-LOOPS_RESULTS: "${{steps.test-loops.outputs.result}}"
+        TEST-BRANCHING_RESULTS: "${{steps.test-branching.outputs.result}}"
+        TEST-STRINGS_RESULTS: "${{steps.test-strings.outputs.result}}"
+      with:
+        runners: test-numbers,test-boolean,test-loops,test-branching,test-strings
